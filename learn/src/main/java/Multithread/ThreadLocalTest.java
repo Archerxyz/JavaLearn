@@ -28,6 +28,8 @@ private static ThreadLocal<Person> tl = new ThreadLocal<>();
             }
             // 没set 会发现拿不着
             tl.set(new Person("asd"));
+
+            System.out.println(tl.get());
         }).start();
     }
 }

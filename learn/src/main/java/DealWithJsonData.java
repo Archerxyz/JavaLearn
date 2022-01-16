@@ -74,6 +74,12 @@ public class DealWithJsonData {
         Set<String> oKeySet = oJson.keySet();
 
         HashMap<String, Integer> oNameMap = new HashMap();
+        char c = 'd';
+        Character c1 = c;
+        Set<Character> set = new HashSet<>();
+        set.add(c);
+
+
 
         JSONObject oNewJson = new JSONObject();
         int ID = 0;

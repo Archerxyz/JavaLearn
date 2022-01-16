@@ -63,4 +63,38 @@ public class Volatile {
     private void printValur(String s) {
         System.out.println(s);
     }
+
+
+
+    // 禁止重排序
+    static class Example {
+
+        int x = 0;
+
+        volatile boolean v = false;
+
+        public void writer() {
+            x = 42;
+            v = true;
+        }
+
+        public void reader() {
+
+            if (v) {
+                System.out.println(x);
+            }
+
+        }
+
+        public static void main(String[] args) {
+            Example e = new Example();
+
+            Thread t1 = new Thread(e::writer);
+            Thread t2 = new Thread(e::reader);
+
+            t1.start();
+            t2.start();
+
+        }
+    }
 }

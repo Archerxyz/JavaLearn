@@ -21,7 +21,6 @@ public class Multithreaded {
     // 线程不安全，但是其他线程不会看到它是null的情况。
     final static Map<String, Integer> account = new HashMap<>();
 
-
     private static Lock oNumLock = new ReentrantLock();
 
     private static Lock odeadLock = new ReentrantLock();
@@ -46,15 +45,13 @@ public class Multithreaded {
             // 临界区 就是try这一块
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    if (plus)
-                    {
+                    if (plus) {
                         int nTemp = new Random(1).nextInt(2000);
                         number1 = number1 + nTemp;
                         number2 = number2 - nTemp;
                         System.out.println(number1 + number2);
                         System.out.println("-------------");
-                    }
-                    else {
+                    } else {
                         int nTemp = new Random(2).nextInt(2000);
                         number1 = number1 - nTemp;
                         number2 = number2 + nTemp;
@@ -64,8 +61,7 @@ public class Multithreaded {
                 }
             } catch (InterruptedException e) {
 //                number = 777;
-            }
-            finally {
+            } finally {
                 // 为保证一定能够解锁
                 oNumLock.unlock();
             }
@@ -81,7 +77,7 @@ public class Multithreaded {
         return t;
     }
 
-    private static void simulationCriticalSection() throws InterruptedException{
+    private static void simulationCriticalSection() throws InterruptedException {
         Thread newt1 = newThread(true);
         Thread newt2 = newThread(false);
         Thread deamon = newDeamonThread();
@@ -122,8 +118,7 @@ public class Multithreaded {
                 while (!Thread.currentThread().isInterrupted()) {
                     Thread.sleep(10);
                     System.out.println(deadlockNum--);
-                    if (deadlockNum < 0)
-                    {
+                    if (deadlockNum < 0) {
                         // 注意，是锁在await，实质上是线程等待?锁控制了当前执行它的线程？
                         // 死锁某个线程，不会导致主线程无法退出。
                         oLessThanZeroCondition.await();
@@ -131,8 +126,7 @@ public class Multithreaded {
                 }
             } catch (InterruptedException e) {
 
-            }
-            finally {
+            } finally {
                 odeadLock.unlock();
             }
         };
@@ -162,7 +156,7 @@ public class Multithreaded {
     }
 
 
-    private static void simulationDeadlock() throws InterruptedException{
+    private static void simulationDeadlock() throws InterruptedException {
         Thread deadlockThread = newDeadLockThread();
         Thread.sleep(2000);
 
@@ -200,6 +194,8 @@ public class Multithreaded {
                 e.printStackTrace();
             }
         };
+        int i = 10000;
+        i = i >> 1;
 
         Thread t = new Thread(r);
         t.start();
@@ -207,7 +203,7 @@ public class Multithreaded {
     }
 
     // 使用同步方法 同等与模拟1
-    private static void simulationSynchronized() throws InterruptedException{
+    private static void simulationSynchronized() throws InterruptedException {
         Thread newt1 = newSynchronizedThread(true);
         Thread newt2 = newSynchronizedThread(false);
 
@@ -250,5 +246,79 @@ public class Multithreaded {
         pool.shutdown();
 
         System.out.println(result.get());
+    }
+
+    public void test1() {
+        String s1 = "a" + "b" + "c";//编译期优化：等同于"abc"
+        String s2 = "abc"; //"abc"一定是放在字符串常量池中，将此地址赋给s2
+        /*
+         * 最终.java编译成.class,再执行.class
+         * String s1 = "abc";
+         * String s2 = "abc"
+         */
+        System.out.println(s1 == s2); //true
+        System.out.println(s1.equals(s2)); //true
+    }
+
+    public void test2() {
+        String s1 = "javaEE";
+        String s2 = "hadoop";
+
+        String s3 = "javaEEhadoop";
+        String s4 = "javaEE" + "hadoop";//编译期优化
+        //如果拼接符号的前后出现了变量，则相当于在堆空间中new String()，具体的内容为拼接的结果：javaEEhadoop
+        String s5 = s1 + "hadoop";
+        String s6 = "javaEE" + s2;
+        String s7 = s1 + s2;
+
+        System.out.println(s3 == s4);//true
+        System.out.println(s3 == s5);//false
+        System.out.println(s3 == s6);//false
+        System.out.println(s3 == s7);//false
+        System.out.println(s5 == s6);//false
+        System.out.println(s5 == s7);//false
+        System.out.println(s6 == s7);//false
+        //intern():判断字符串常量池中是否存在javaEEhadoop值，如果存在，则返回常量池中javaEEhadoop的地址；
+        //如果字符串常量池中不存在javaEEhadoop，则在常量池中加载一份javaEEhadoop，并返回次对象的地址。
+        String s8 = s6.intern();
+        System.out.println(s3 == s8);//true
+    }
+
+    /**
+     * 思考：
+     * new String("a") + new String("b")呢？
+     * 对象1：new StringBuilder()
+     * 对象2： new String("a")
+     * 对象3： 常量池中的"a"
+     * 对象4： new String("b")
+     * 对象5： 常量池中的"b"
+     * <p>
+     * 深入剖析： StringBuilder的toString():
+     * 对象6 ：new String("ab")
+     * 强调一下，toString()的调用，在字符串常量池中，没有生成"ab"
+     */
+
+    public void StringNewTest() {
+        String str = new String("a") + new String("b");
+
+    }
+
+
+    /**
+     * StringIntern.java中练习的拓展：
+     */
+    public void StringNewTest2() {
+        //执行完下一行代码以后，字符串常量池中，是否存在"11"呢？答案：不存在！！
+        String s3 = new String("1") + new String("1");//new String("11")
+        //在字符串常量池中生成对象"11"，代码顺序换一下，实打实的在字符串常量池里有一个"11"对象
+        String s4 = "11";
+        String s5 = s3.intern();
+
+        // s3 是堆中的 "ab" ，s4 是字符串常量池中的 "ab"
+        System.out.println(s3 == s4);//false
+
+        // s5 是从字符串常量池中取回来的引用，当然和 s4 相等
+        System.out.println(s5 == s4);//true
+
     }
 }

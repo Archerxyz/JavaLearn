@@ -3,6 +3,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 import static java.util.ArrayList.*;
 import static oracle.jrockit.jfr.events.Bits.intValue;
@@ -29,7 +32,15 @@ public class Learn {
         {
 
         }
-        C();
+
+        int input = 23;
+
+        if ((input & 1) == 1){
+            input++;
+        }
+
+        int[] temp2 = new int[]{1,2,4,6,87};
+        Arrays.sort(temp2);
     }
 
     private static void A() {
@@ -37,6 +48,8 @@ public class Learn {
         System.out.println(d.hashCode());
         System.out.println(d);
         Integer a = 8;
+        LinkedList<Integer> temp = new LinkedList<>();
+
         int aTemp = intValue(a);
 
         // 在这处理异常，是自己处理

@@ -67,9 +67,10 @@ public class RegionUtil {
 		for (String regionStr : regionChineseToEnglishMap.keySet()){
 			regions.add(new Region(regionStr, regionChineseToEnglishMap.get(regionStr)));
 		}
+
 		return regions;
 	}
-	
+
 	
 	public static Map<String, String> getCNENRegions(String enRegions){
 		init();
