@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ReentrantLockTest {
 
-    static Lock lock1 = new ReentrantLock();
+    static Lock lock1 = new ReentrantLock(false);
     static Lock lock2 = new ReentrantLock();
 
     public static void main(String[] args) throws InterruptedException {
@@ -15,7 +15,9 @@ public class ReentrantLockTest {
         Thread thread1 = new Thread(new ThreadDemo(lock2, lock1));//该线程先获取锁2,再获取锁1
         thread.start();
         thread1.start();
-        thread.interrupt();//是第一个线程中断
+
+        // 中断是一种解决死锁的方式。
+//        thread.interrupt();//是第一个线程中断
     }
 
     static class ThreadDemo implements Runnable {
@@ -30,15 +32,37 @@ public class ReentrantLockTest {
         @Override
         public void run() {
             try {
-                firstLock.lockInterruptibly();
-                TimeUnit.MILLISECONDS.sleep(10);//更好的触发死锁
-                secondLock.lockInterruptibly();
+
+                lockInterruptibly();
+                tryLock();
+
+
+
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 firstLock.unlock();
                 secondLock.unlock();
                 System.out.println(Thread.currentThread().getName()+"正常结束!");
+            }
+        }
+
+
+        private void lockInterruptibly() throws InterruptedException {
+            // 可中断锁
+            firstLock.lockInterruptibly();
+            TimeUnit.MILLISECONDS.sleep(10);//更好的触发死锁
+            secondLock.lockInterruptibly();
+        }
+
+        private void tryLock() throws InterruptedException {
+            while(!lock1.tryLock()){
+                TimeUnit.MILLISECONDS.sleep(10);
+            }
+            while(!lock2.tryLock()){
+                lock1.unlock();
+                TimeUnit.MILLISECONDS.sleep(10);
             }
         }
     }
